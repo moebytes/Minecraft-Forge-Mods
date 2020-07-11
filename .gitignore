@@ -1,10 +1,10 @@
-Modding Workspace/LightCycleMod/.metadata/*
+Modding Workspace/LightCycleMod/.metadata
 Modding Workspace/LightCycleMod/gradlew
 Modding Workspace/LightCycleMod/gradle
-Modding Workspace/LightCycleMod/.gradle/*
-Modding Workspace/LightCycleMod/.settings/*
-Modding Workspace/LightCycleMod/bin/*
-Modding Workspace/LightCycleMod/run/*
+Modding Workspace/LightCycleMod/.gradle
+Modding Workspace/LightCycleMod/.settings
+Modding Workspace/LightCycleMod/bin
+Modding Workspace/LightCycleMod/run
 Modding Workspace/LightCycleMod/.classpath
 Modding Workspace/LightCycleMod/.project
 Modding Workspace/LightCycleMod/gradlew.bat
