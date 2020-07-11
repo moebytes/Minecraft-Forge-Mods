@@ -1,17 +1,29 @@
 package LightCycleMod;
 
-import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+/*
+ * Author	: Peter Caylor
+ * Date		: 7/11/2020
+ * Purpose	: This class receives events from forge and runs the appropriate function depending on what is fired.
+ */
 
 //Handle events and then run the appropriate functions based on those events
 @Mod.EventBusSubscriber
 public class LightEventHandler {
 
 	private LightCycleFunctions functions;
+	
+	
+	@SubscribeEvent
+	public void on_start( FMLServerStartingEvent event )
+	{
+		functions.register_server_commands(event);
+	}
 	
 	@SubscribeEvent
 	public void on_load( WorldEvent.Load event )
@@ -30,11 +42,6 @@ public class LightEventHandler {
 		functions.on_world_tick( event );
 	}
 
-	//Receive commands and handle using brigadier
-	@SubscribeEvent
-	public void read_chat( ServerChatEvent event )
-	{
-		functions.read_chat(event);
-	}
 
+	
 }

@@ -22,4 +22,5 @@ public class LightCycleMod
 		LightEventHandler event = new LightEventHandler();
 		MinecraftForge.EVENT_BUS.register(event);
 	}
+
 }

@@ -3,6 +3,9 @@ package LightCycleMod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mojang.brigadier.CommandDispatcher;
+
+import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -13,7 +16,14 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
+
+/*
+ * Author	: Peter Caylor
+ * Date		: 7/11/2020
+ * Purpose	: This class handles the internal functionality for the light cycle mod. Functions here modify the server time or assist other functions.
+ */
 
 public class LightCycleFunctions{
 
@@ -27,9 +37,9 @@ public class LightCycleFunctions{
 	long					inc_time_by;
 	double					new_cycle_in_minutes;
 
-	final int DEFAULT_CYCLE_TIME	= 20;
-	final int TICKS_PER_DAY			= 24000;
-	final Logger logger 			= LogManager.getLogger();
+	final int 				DEFAULT_CYCLE_TIME	= 20;
+	final int 				TICKS_PER_DAY		= 24000;
+	final Logger 			logger 				= LogManager.getLogger();
 	
 	//Basic setup to do once the world loads
 	//Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false 
@@ -41,8 +51,7 @@ public class LightCycleFunctions{
 		worldinfo 				= serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
 		gamerules				= minecraftserver.getGameRules();
 		
-		new_cycle_in_minutes	= 40;
-		
+		new_cycle_in_minutes	= 5;
 		set_inc_time_by( new_cycle_in_minutes );
 	}
 	
@@ -65,10 +74,11 @@ public class LightCycleFunctions{
 		if ( gametime % 20 == 0 && gametime != 0)
 		{
 			worldinfo.setDayTime(curr_day_time + inc_time_by);
-			logger.info("CURRENT TIME  : " + worldinfo.getDayTime() );
+			logger.info("TIME: " + curr_day_time);
 		}
 	}
 
+	
 	public void read_chat(ServerChatEvent event)
 	{
 		minecraftserver.getCommandManager();
@@ -76,7 +86,8 @@ public class LightCycleFunctions{
 		logger.info("USERNAME: " + event.getUsername() );
 		logger.info("MESSAGE : " + event.getMessage() );
 	}
-
+	
+	
 	//Gets the do_daylight_cycle gamerule and sets it to false so I can increment the daylight cycle myself
 	public void disable_doDaylightCycle()
 	{
@@ -91,16 +102,24 @@ public class LightCycleFunctions{
 			inc_time_by = (long)temp_timer;
 		else
 			inc_time_by = (long)Math.ceil(temp_timer);
-		
-		logger.info("TIME INC: " + inc_time_by);
-		
 	}
-
+	
+	public long get_inc_time_by()
+	{
+		return inc_time_by;
+	}
+	
 	//Read the requested daylight cycle time in minutes and return the ratio of that vs the default
 	public double get_ticks_per_second(double new_cycle_length)
 	{
 		return (double)TICKS_PER_DAY / ( 60.0 * new_cycle_length );
 	}
 	
+	
+	public void register_server_commands(FMLServerStartingEvent event)
+	{
+		CommandDispatcher<CommandSource> dispatcher = event.getServer().getCommandManager().getDispatcher();
+		LightCommands commands = new LightCommands( dispatcher, this );
+	}
 
 }
