@@ -17,15 +17,14 @@ public class LightCycleMod
 	//Allows us to reference our main mod class from outside the main mod class
 	public 	static 			LightCycleMod instance;
 	public 	static final 	String mod_id = "lightcyclemod";
-	private static final 	Logger logger = LogManager.getLogger(mod_id);
+	public static final 	Logger logger = LogManager.getLogger(mod_id);
 	public 					ServerWorld serverworld;
 	//Register the functions for ForgeModLoader
 	public LightCycleMod()
 	{
-		//Allows us to reference our main mod class from outside the main mod class
+		//Registers these classes and all functions with the @SubscribeEvent the FML event bus, so they will run when we load the mod
 		instance = this;
 		LightEventHandler event = new LightEventHandler();
-		//Registers these classes and all functions with the @SubscribeEvent the FML event bus, so they will run when we load the mod
 		MinecraftForge.EVENT_BUS.register(event);
 	}
 }
