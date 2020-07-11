@@ -1,7 +1,7 @@
 package LightCycleMod;
 
 import net.minecraftforge.event.ServerChatEvent;
-import net.minecraftforge.event.TickEvent.WorldTickEvent;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -16,13 +16,16 @@ public class LightEventHandler {
 	@SubscribeEvent
 	public void on_load( WorldEvent.Load event )
 	{
-		functions = new LightCycleFunctions( event );
-		functions.disable_doDaylightCycle();
+		if ( functions == null )
+		{
+			functions = new LightCycleFunctions( event );
+			functions.disable_doDaylightCycle();
+		}
 	}
 
 	//Tick the server time on teach server sided world tick.
 	@SubscribeEvent
-	public void on_world_tick( WorldTickEvent event )
+	public void on_world_tick( ServerTickEvent event )
 	{
 		functions.on_world_tick( event );
 	}
