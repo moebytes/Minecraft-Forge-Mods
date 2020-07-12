@@ -15,6 +15,7 @@ public class DataStorage{
 	
 	//Writes the light cycle time to a file.
 	//TODO: Update to receive an object. Write the object.
+	//TODO: Make error catching cleaner
 	public void write_json(double inc_time_by)
 	{
 		try {
@@ -43,6 +44,7 @@ public class DataStorage{
 	}
 	
 	//Reads the light cycle time from a file named {json_path}
+	//TODO: Make error catching cleaner
 	public double read_json()
 	{
 		try

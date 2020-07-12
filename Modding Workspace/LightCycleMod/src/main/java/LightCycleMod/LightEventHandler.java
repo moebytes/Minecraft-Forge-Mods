@@ -47,7 +47,4 @@ public class LightEventHandler {
 		return functions;
 	}
 	
-
-
-
 }

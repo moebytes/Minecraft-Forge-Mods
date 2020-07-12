@@ -33,10 +33,13 @@ public class LightCycleFunctions{
 	IServerConfiguration	serverconfig;		//func_240793_aU_ is getIServerConfiguration();
 	IServerWorldInfo		worldinfo; 			//func_230407_G_  is getIServerWorldInfo
 	
+	int						update_push_freq;
+	
 	long					curr_day_time;
 	long					inc_time_by;
 
 	double					new_cycle_in_minutes	= 0;
+	
 	final int				DEFAULT_CYCLE_TIME		= 20;
 	final int				TICKS_PER_DAY			= 24000;
 	final Logger			logger 					= LogManager.getLogger();
@@ -51,6 +54,7 @@ public class LightCycleFunctions{
 		worldinfo				= serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
 		gamerules				= minecraftserver.getGameRules();
 		
+
 		try
 		{
 			new_cycle_in_minutes = (new DataStorage()).read_json();
@@ -62,10 +66,9 @@ public class LightCycleFunctions{
 		
 		if (new_cycle_in_minutes == 0)
 			new_cycle_in_minutes = DEFAULT_CYCLE_TIME;
-		
+
+		update_push_freq();
 		set_inc_time_by( new_cycle_in_minutes );
-		
-		
 	}
 	
 	//Tick the server time on server sided world tick.
@@ -80,19 +83,18 @@ public class LightCycleFunctions{
 			logger.info("WORLD IS NULL");
 			return;
 		}
-
+		
 		//Update the current time and then increment it
 		curr_day_time = worldinfo.getDayTime();
 		long gametime = worldinfo.getGameTime();
-		if ( gametime % 5 == 0 && gametime != 0)
+		if ( gametime % update_push_freq == 0 && gametime != 0)
 		{
-			minecraftserver.getPlayerList().func_232642_a_(new SUpdateTimePacket(world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), world.func_234923_W_());
-			worldinfo.setDayTime( curr_day_time + (inc_time_by / 5) );
-		}
-		
-		if ( gametime % 20 == 0 && gametime != 0)
-			logger.info("TIME: " + curr_day_time);
+			worldinfo.setDayTime( curr_day_time + ( inc_time_by / ( DEFAULT_CYCLE_TIME / update_push_freq ) ) );
+			//logger.info("TIME: " + worldinfo.getDayTime());
 			
+			if (gametime % 20 != 0 )
+				minecraftserver.getPlayerList().func_232642_a_(new SUpdateTimePacket(world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), world.func_234923_W_());
+		}
 		
 	}
 
@@ -101,6 +103,19 @@ public class LightCycleFunctions{
 		logger.info("READ A CHAT MESSAGE." + event.getMessage() );
 		logger.info("USERNAME: " + event.getUsername() );
 		logger.info("MESSAGE : " + event.getMessage() );
+	}
+	
+	//Updates how often the server pushes world SUpdateTimePackets to clients
+	public void update_push_freq()
+	{
+		if (new_cycle_in_minutes < 5)
+			update_push_freq = 2;
+		else if (new_cycle_in_minutes < 10)
+			update_push_freq = 5;
+		else if (new_cycle_in_minutes < 20)
+			update_push_freq = 10;
+		else
+			update_push_freq = 20;
 	}
 	
 	//Sets the server cycle rate on start
@@ -119,7 +134,9 @@ public class LightCycleFunctions{
 		catch(Exception e)
 		{
 			logger.info("Could not read last increment speed from json: " + e);
-		}
+		}		
+		
+		update_push_freq();
 	}
 	
 	//Gets the do_daylight_cycle gamerule and sets it to false so I can increment the daylight cycle myself
@@ -131,15 +148,14 @@ public class LightCycleFunctions{
 	
 	public void set_inc_time_by(double new_cycle_in_minutes)
 	{
-		//Get an even number that is closest to what we want
-		double temp_timer = get_ticks_per_second( new_cycle_in_minutes );
-		if ( temp_timer - Math.floor(temp_timer) < .5 )
-			inc_time_by = (long)temp_timer;
-		else
-			inc_time_by = (long)Math.floor(temp_timer);
+		this.new_cycle_in_minutes = new_cycle_in_minutes;
 		
+		//Get an even number that is closest to what we want
+		inc_time_by = (long)get_ticks_per_second( new_cycle_in_minutes );
 		DataStorage storage = new DataStorage();
 		storage.write_json(new_cycle_in_minutes);
+		update_push_freq();
+		logger.info( "Set Daylight Cycle to " + new_cycle_in_minutes );
 	}
 	
 	public long get_inc_time_by()
