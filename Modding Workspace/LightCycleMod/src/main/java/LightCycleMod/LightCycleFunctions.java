@@ -3,9 +3,6 @@ package LightCycleMod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.brigadier.CommandDispatcher;
-
-import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -118,8 +115,8 @@ public class LightCycleFunctions{
 	
 	public void register_server_commands(FMLServerStartingEvent event)
 	{
-		CommandDispatcher<CommandSource> dispatcher = event.getServer().getCommandManager().getDispatcher();
-		LightCommands commands = new LightCommands( dispatcher, this );
+		//CommandDispatcher<CommandSource> dispatcher = event.getServer().getCommandManager().getDispatcher();
+		LightCommands.register( event.getCommandDispatcher() );
 	}
 
 }

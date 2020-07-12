@@ -42,6 +42,9 @@ public class LightEventHandler {
 		functions.on_world_tick( event );
 	}
 
-
+	public LightCycleFunctions get_functions()
+	{
+		return functions;
+	}
 	
 }
