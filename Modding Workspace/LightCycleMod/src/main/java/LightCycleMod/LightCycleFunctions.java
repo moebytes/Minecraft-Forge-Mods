@@ -25,18 +25,18 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 public class LightCycleFunctions{
 
 	public					World world;
-	MinecraftServer 		minecraftserver;
+	MinecraftServer			minecraftserver;
 	GameRules				gamerules;
-	IServerConfiguration 	serverconfig;		//func_240793_aU_ is getIServerConfiguration();
-	IServerWorldInfo 		worldinfo; 			//func_230407_G_  is getIServerWorldInfo
+	IServerConfiguration	serverconfig;		//func_240793_aU_ is getIServerConfiguration();
+	IServerWorldInfo		worldinfo; 			//func_230407_G_  is getIServerWorldInfo
 	
 	long					curr_day_time;
 	long					inc_time_by;
 	double					new_cycle_in_minutes;
 
-	final int 				DEFAULT_CYCLE_TIME	= 20;
-	final int 				TICKS_PER_DAY		= 24000;
-	final Logger 			logger 				= LogManager.getLogger();
+	final int				DEFAULT_CYCLE_TIME	= 20;
+	final int				TICKS_PER_DAY		= 24000;
+	final Logger			logger 				= LogManager.getLogger();
 	
 	//Basic setup to do once the world loads
 	//Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false 
