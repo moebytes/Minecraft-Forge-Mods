@@ -15,15 +15,14 @@ public class LightCommands{
 		dispatcher.register(
 			Commands.literal(LightCycleMod.mod_id)
 			.then(
-					Commands.literal("set")
-					.requires( cs -> cs.hasPermissionLevel(2))
-					.then(
-						Commands.argument("<Full Day Length: Minutes>", DoubleArgumentType.doubleArg(-10000, 10000))
-							.executes((context) -> {
-										return (int) set_light_cycle_length(context.getSource(), DoubleArgumentType.getDouble(context, "<Full Day Length: Minutes>"));
-							}
-						)
-							
+				Commands.literal("set")
+				.requires( cs -> cs.hasPermissionLevel(2))
+				.then(
+					Commands.argument("<Full Day Length: Minutes>", DoubleArgumentType.doubleArg(-10000, 10000))
+					.executes((context) -> {
+						return (int) set_light_cycle_length(context.getSource(), DoubleArgumentType.getDouble(context, "<Full Day Length: Minutes>"));
+						}
+					)
 				)
 			)
 		);
