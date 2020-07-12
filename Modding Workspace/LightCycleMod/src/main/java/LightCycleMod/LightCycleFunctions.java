@@ -32,11 +32,11 @@ public class LightCycleFunctions{
 	
 	long					curr_day_time;
 	long					inc_time_by;
-	double					new_cycle_in_minutes;
 
-	final int				DEFAULT_CYCLE_TIME	= 20;
-	final int				TICKS_PER_DAY		= 24000;
-	final Logger			logger 				= LogManager.getLogger();
+	double					new_cycle_in_minutes	= 0;
+	final int				DEFAULT_CYCLE_TIME		= 20;
+	final int				TICKS_PER_DAY			= 24000;
+	final Logger			logger 					= LogManager.getLogger();
 	
 	//Basic setup to do once the world loads
 	//Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false 
@@ -48,8 +48,19 @@ public class LightCycleFunctions{
 		worldinfo				= serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
 		gamerules				= minecraftserver.getGameRules();
 		
-		new_cycle_in_minutes	= 5;
+		try
+		{
+			new_cycle_in_minutes = (new DataStorage()).read_json();
+		}
+		catch(Exception e)
+		{
+			logger.info("Error reading json file.");
+		}
+		if (new_cycle_in_minutes == 0)
+			new_cycle_in_minutes = DEFAULT_CYCLE_TIME;
 		set_inc_time_by( new_cycle_in_minutes );
+		
+		
 	}
 	
 	//Tick the server time on teach server sided world tick.
@@ -86,6 +97,7 @@ public class LightCycleFunctions{
 	
 	
 	//Gets the do_daylight_cycle gamerule and sets it to false so I can increment the daylight cycle myself
+	//Saves the current speed in a txt file so it persists beyond restarts
 	public void disable_doDaylightCycle()
 	{
 		gamerules.get( GameRules.DO_DAYLIGHT_CYCLE ).set( false, minecraftserver );
@@ -98,7 +110,10 @@ public class LightCycleFunctions{
 		if ( temp_timer - Math.floor(temp_timer) < .5 )
 			inc_time_by = (long)temp_timer;
 		else
-			inc_time_by = (long)Math.ceil(temp_timer);
+			inc_time_by = (long)Math.floor(temp_timer);
+		
+		DataStorage storage = new DataStorage();
+		storage.write_json(new_cycle_in_minutes);
 	}
 	
 	public long get_inc_time_by()
