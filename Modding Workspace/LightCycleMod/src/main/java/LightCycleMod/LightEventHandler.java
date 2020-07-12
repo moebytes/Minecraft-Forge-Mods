@@ -1,5 +1,10 @@
 package LightCycleMod;
 
+import java.io.File;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,8 +22,8 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 public class LightEventHandler {
 
 	private LightCycleFunctions functions;
-	
-	
+	private Logger logger = LogManager.getLogger();
+
 	@SubscribeEvent
 	public void on_start( FMLServerStartingEvent event )
 	{
@@ -28,10 +33,24 @@ public class LightEventHandler {
 	@SubscribeEvent
 	public void on_load( WorldEvent.Load event )
 	{
+		DataStorage storage = new DataStorage();
 		if ( functions == null )
 		{
 			functions = new LightCycleFunctions( event );
 			functions.disable_doDaylightCycle();
+			
+			try
+			{
+				File file = new File("lightcyclemod.txt");
+				if ( file.exists() )
+					this.functions.new_cycle_in_minutes = storage.read_json();
+				else
+					storage.write_json(LightCycleMod.instance.handler.get_functions().get_inc_time_by());
+			}
+			catch(Exception e)
+			{
+				logger.info("Could not read last increment speed from json: " + e);
+			}
 		}
 	}
 
@@ -46,5 +65,6 @@ public class LightEventHandler {
 	{
 		return functions;
 	}
-	
+
+
 }
