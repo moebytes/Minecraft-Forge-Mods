@@ -11,15 +11,15 @@ import net.minecraftforge.fml.common.Mod;
 public class LightCycleMod 
 {
 	//Allows us to reference our main mod class from outside the main mod class
-	public 	static 			LightCycleMod instance;
-	public 	static final 	String mod_id = "lightcyclemod";
-	
+	public 	static 			LightCycleMod 		instance;
+	public 	static final 	String 				mod_id = "lightcyclemod";
+	public					LightEventHandler 	handler = new LightEventHandler();
 	//Register the functions for ForgeModLoader
 	public LightCycleMod()
 	{
 		//Registers these classes and all functions with the @SubscribeEvent the FML event bus, so they will run when we load the mod
 		instance = this;
-		LightEventHandler event = new LightEventHandler();
-		MinecraftForge.EVENT_BUS.register(event);
+		MinecraftForge.EVENT_BUS.register( handler );
 	}
+
 }
