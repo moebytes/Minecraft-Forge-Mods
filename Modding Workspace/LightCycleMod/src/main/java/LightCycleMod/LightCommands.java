@@ -7,6 +7,11 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.StringTextComponent;
 
+/*
+ * Author	: Peter Caylor
+ * Date		: 7/12/2020
+ * Purpose	: Registers commands with the server. Allows for command auto-complete
+ */
 public class LightCommands{
 
 	static LightCycleFunctions functions = LightCycleMod.instance.handler.get_functions();
@@ -18,9 +23,9 @@ public class LightCommands{
 				Commands.literal("set")
 				.requires( cs -> cs.hasPermissionLevel(2))
 				.then(
-					Commands.argument("<Full Day Length: Minutes>", DoubleArgumentType.doubleArg(-10000, 10000))
+					Commands.argument("Light Cycle Duration: Minutes", DoubleArgumentType.doubleArg(-10000, 10000))
 					.executes((context) -> {
-						return (int) set_light_cycle_length(context.getSource(), DoubleArgumentType.getDouble(context, "<Full Day Length: Minutes>"));
+						return (int) set_light_cycle_length(context.getSource(), DoubleArgumentType.getDouble(context, "Light Cycle Duration: Minutes"));
 						}
 					)
 				)
