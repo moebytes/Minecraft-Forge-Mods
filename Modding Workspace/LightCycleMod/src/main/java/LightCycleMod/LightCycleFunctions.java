@@ -42,10 +42,10 @@ public class LightCycleFunctions{
 	//Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false 
 	public LightCycleFunctions(WorldEvent event)
 	{
-		this.world 				= event.getWorld().getWorld();
-		minecraftserver 		= this.world.getServer();
-		serverconfig 			= minecraftserver.func_240793_aU_();	//func_240793_aU_ is get_IServerConfiguration();
-		worldinfo 				= serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
+		this.world				= event.getWorld().getWorld();
+		minecraftserver			= this.world.getServer();
+		serverconfig			= minecraftserver.func_240793_aU_();	//func_240793_aU_ is get_IServerConfiguration();
+		worldinfo				= serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
 		gamerules				= minecraftserver.getGameRules();
 		
 		new_cycle_in_minutes	= 5;
