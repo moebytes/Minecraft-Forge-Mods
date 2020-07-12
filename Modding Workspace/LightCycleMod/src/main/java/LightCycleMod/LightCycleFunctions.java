@@ -27,32 +27,32 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 public class LightCycleFunctions{
 
-	public					World world;
-	MinecraftServer			minecraftserver;
-	GameRules				gamerules;
-	IServerConfiguration	serverconfig;		//func_240793_aU_ is getIServerConfiguration();
-	IServerWorldInfo		worldinfo; 			//func_230407_G_  is getIServerWorldInfo
+	public World         world;
+	MinecraftServer      minecraftserver;
+	GameRules            gamerules;
+	IServerConfiguration serverconfig;		//func_240793_aU_ is getIServerConfiguration();
+	IServerWorldInfo     worldinfo; 			//func_230407_G_  is getIServerWorldInfo
 	
-	int						update_push_freq;
+	int                  update_push_freq;
 	
-	long					curr_day_time;
-	long					inc_time_by;
+	long                 curr_day_time;
+	long                 inc_time_by;
 
-	double					new_cycle_in_minutes	= 0;
+	double	             new_cycle_in_minutes = 0;
 	
-	final int				DEFAULT_CYCLE_TIME		= 20;
-	final int				TICKS_PER_DAY			= 24000;
-	final Logger			logger 					= LogManager.getLogger();
+	final int            DEFAULT_CYCLE_TIME   = 20;
+	final int            TICKS_PER_DAY        = 24000;
+	final Logger         logger               = LogManager.getLogger();
 	
 	//Basic setup to do once the world loads
 	//Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false 
 	public LightCycleFunctions(WorldEvent event)
 	{
-		this.world				= event.getWorld().getWorld();
-		minecraftserver			= this.world.getServer();
-		serverconfig			= minecraftserver.func_240793_aU_();	//func_240793_aU_ is get_IServerConfiguration();
-		worldinfo				= serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
-		gamerules				= minecraftserver.getGameRules();
+		this.world      = event.getWorld().getWorld();
+		minecraftserver = this.world.getServer();
+		serverconfig    = minecraftserver.func_240793_aU_();	//func_240793_aU_ is get_IServerConfiguration();
+		worldinfo       = serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
+		gamerules       = minecraftserver.getGameRules();
 		
 
 		try
