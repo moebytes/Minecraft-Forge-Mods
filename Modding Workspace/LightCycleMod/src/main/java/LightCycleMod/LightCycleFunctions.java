@@ -1,8 +1,11 @@
 package LightCycleMod;
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.network.play.server.SUpdateTimePacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -19,7 +22,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 /*
  * Author	: Peter Caylor
  * Date		: 7/11/2020
- * Purpose	: This class handles the internal functionality for the light cycle mod. Functions here modify the server time or assist other functions.
+ * Purpose	: Handles the internal functionality for the light cycle mod. Functions here modify the server time or assist other functions.
  */
 
 public class LightCycleFunctions{
@@ -56,14 +59,16 @@ public class LightCycleFunctions{
 		{
 			logger.info("Error reading json file.");
 		}
+		
 		if (new_cycle_in_minutes == 0)
 			new_cycle_in_minutes = DEFAULT_CYCLE_TIME;
+		
 		set_inc_time_by( new_cycle_in_minutes );
 		
 		
 	}
 	
-	//Tick the server time on teach server sided world tick.
+	//Tick the server time on server sided world tick.
 	public void on_world_tick(ServerTickEvent event)
 	{
 		//Check to prevent logical side errors and null values here
@@ -79,22 +84,43 @@ public class LightCycleFunctions{
 		//Update the current time and then increment it
 		curr_day_time = worldinfo.getDayTime();
 		long gametime = worldinfo.getGameTime();
-		if ( gametime % 20 == 0 && gametime != 0)
+		if ( gametime % 5 == 0 && gametime != 0)
 		{
-			worldinfo.setDayTime(curr_day_time + inc_time_by);
-			logger.info("TIME: " + curr_day_time);
+			minecraftserver.getPlayerList().func_232642_a_(new SUpdateTimePacket(world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), world.func_234923_W_());
+			worldinfo.setDayTime( curr_day_time + (inc_time_by / 5) );
 		}
+		
+		if ( gametime % 20 == 0 && gametime != 0)
+			logger.info("TIME: " + curr_day_time);
+			
+		
 	}
 
-	
 	public void read_chat(ServerChatEvent event)
 	{
-		minecraftserver.getCommandManager();
 		logger.info("READ A CHAT MESSAGE." + event.getMessage() );
 		logger.info("USERNAME: " + event.getUsername() );
 		logger.info("MESSAGE : " + event.getMessage() );
 	}
 	
+	//Sets the server cycle rate on start
+	public void set_time_on_start()
+	{
+		DataStorage storage = new DataStorage();
+		try
+		{
+			File file = new File(storage.get_json_path());
+			if ( file.exists() )
+				new_cycle_in_minutes = storage.read_json();
+			else
+				//storage.write_json(LightCycleMod.instance.handler.get_functions().get_inc_time_by());
+				storage.write_json( DEFAULT_CYCLE_TIME );
+		}
+		catch(Exception e)
+		{
+			logger.info("Could not read last increment speed from json: " + e);
+		}
+	}
 	
 	//Gets the do_daylight_cycle gamerule and sets it to false so I can increment the daylight cycle myself
 	//Saves the current speed in a txt file so it persists beyond restarts
@@ -130,7 +156,6 @@ public class LightCycleFunctions{
 	
 	public void register_server_commands(FMLServerStartingEvent event)
 	{
-		//CommandDispatcher<CommandSource> dispatcher = event.getServer().getCommandManager().getDispatcher();
 		LightCommands.register( event.getCommandDispatcher() );
 	}
 
