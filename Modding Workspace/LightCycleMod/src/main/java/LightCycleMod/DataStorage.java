@@ -10,9 +10,11 @@ import java.util.Scanner;
 
 public class DataStorage{
 
-	String json_path = "lightcyclemod.txt";
-	String error_path = "lasterror.txt";
+	private final String json_path  = "lightcyclemod.txt";
+	private final String error_path = "lasterror.txt";
 	
+	//Writes the light cycle time to a file.
+	//TODO: Update to receive an object. Write the object.
 	public void write_json(double inc_time_by)
 	{
 		try {
@@ -40,6 +42,7 @@ public class DataStorage{
 		
 	}
 	
+	//Reads the light cycle time from a file named {json_path}
 	public double read_json()
 	{
 		try
@@ -66,7 +69,17 @@ public class DataStorage{
 			}
 			
 		}
-		return (long)0;
+		return 0.0;
+	}
+	
+	public String get_json_path()
+	{
+		return json_path;
+	}
+	
+	public String get_error_path()
+	{
+		return error_path;
 	}
 	
 }
