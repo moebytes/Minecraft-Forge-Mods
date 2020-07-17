@@ -27,46 +27,37 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 public class LightCycleFunctions{
 
-	public World         world;
-	MinecraftServer      minecraftserver;
-	GameRules            gamerules;
-	IServerConfiguration serverconfig;		//func_240793_aU_ is getIServerConfiguration();
-	IServerWorldInfo     worldinfo; 			//func_230407_G_  is getIServerWorldInfo
+    public  static LightCycleFunctions  instance;
+	private        World                world;
+	private        MinecraftServer      minecraftserver;
+	private        GameRules            gamerules;
+	private        IServerConfiguration serverconfig;		//func_240793_aU_ is getIServerConfiguration();
+	private        IServerWorldInfo     worldinfo; 			//func_230407_G_  is getIServerWorldInfo
 	
-	int                  update_push_freq;
+	private        int                  update_push_freq;
 	
-	long                 curr_day_time;
-	long                 inc_time_by;
+	private        long                 curr_day_time;
+	private        long                 inc_time_by;
 
-	double	             new_cycle_in_minutes = 0;
+	private        double               new_cycle_in_minutes = 0;
 	
-	final int            DEFAULT_CYCLE_TIME   = 20;
-	final int            TICKS_PER_DAY        = 24000;
-	final Logger         logger               = LogManager.getLogger();
+	public  final  int                  DEFAULT_CYCLE_TIME   = 20;
+	public  final  int                  TICKS_PER_DAY        = 24000;
+	private final  Logger               logger               = LogManager.getLogger();
 	
 	//Basic setup to do once the world loads
 	//Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false 
-	public LightCycleFunctions(WorldEvent event)
+	public LightCycleFunctions(WorldEvent.Load event)
 	{
+	    instance        = this;
 		this.world      = event.getWorld().getWorld();
 		minecraftserver = this.world.getServer();
-		serverconfig    = minecraftserver.func_240793_aU_();	//func_240793_aU_ is get_IServerConfiguration();
-		worldinfo       = serverconfig.func_230407_G_(); 			//func_230407_G_  is get_IServerWorldInfo
+		serverconfig    = minecraftserver.func_240793_aU_();          //func_240793_aU_ is get_IServerConfiguration()
+		worldinfo       = serverconfig.func_230407_G_();              //func_230407_G_  is get_IServerWorldInfo()
 		gamerules       = minecraftserver.getGameRules();
 		
-
-		try
-		{
-			new_cycle_in_minutes = (new DataStorage()).read_json();
-		}
-		catch(Exception e)
-		{
-			logger.info("Error reading json file.");
-		}
-		
-		if (new_cycle_in_minutes == 0)
-			new_cycle_in_minutes = DEFAULT_CYCLE_TIME;
-
+		gamerules.get( GameRules.DO_DAYLIGHT_CYCLE ).set( false, minecraftserver );
+		new_cycle_in_minutes = set_time_on_start();
 		update_push_freq();
 		set_inc_time_by( new_cycle_in_minutes );
 	}
@@ -92,6 +83,7 @@ public class LightCycleFunctions{
 			worldinfo.setDayTime( curr_day_time + ( inc_time_by / ( DEFAULT_CYCLE_TIME / update_push_freq ) ) );
 			//logger.info("TIME: " + worldinfo.getDayTime());
 			
+			//This already happens every 20 ticks, so I want to do it whenever it is not normally done
 			if (gametime % 20 != 0 )
 				minecraftserver.getPlayerList().func_232642_a_(new SUpdateTimePacket(world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)), world.func_234923_W_());
 		}
@@ -119,48 +111,24 @@ public class LightCycleFunctions{
 	}
 	
 	//Sets the server cycle rate on start
-	public void set_time_on_start()
+	//If there is no file storing a previous cycle rate, set it to default
+	public double set_time_on_start()
 	{
+	    //TODO: update read/write functions error catching in case of no file / bad read uses this logic instead
 		DataStorage storage = new DataStorage();
 		try
 		{
 			File file = new File(storage.get_json_path());
 			if ( file.exists() )
-				new_cycle_in_minutes = storage.read_json();
+				return storage.read_json();
 			else
-				//storage.write_json(LightCycleMod.instance.handler.get_functions().get_inc_time_by());
-				storage.write_json( DEFAULT_CYCLE_TIME );
+                storage.write_json( DEFAULT_CYCLE_TIME );
 		}
 		catch(Exception e)
 		{
 			logger.info("Could not read last increment speed from json: " + e);
-		}		
-		
-		update_push_freq();
-	}
-	
-	//Gets the do_daylight_cycle gamerule and sets it to false so I can increment the daylight cycle myself
-	//Saves the current speed in a txt file so it persists beyond restarts
-	public void disable_doDaylightCycle()
-	{
-		gamerules.get( GameRules.DO_DAYLIGHT_CYCLE ).set( false, minecraftserver );
-	}
-	
-	public void set_inc_time_by(double new_cycle_in_minutes)
-	{
-		this.new_cycle_in_minutes = new_cycle_in_minutes;
-		
-		//Get an even number that is closest to what we want
-		inc_time_by = (long)get_ticks_per_second( new_cycle_in_minutes );
-		DataStorage storage = new DataStorage();
-		storage.write_json(new_cycle_in_minutes);
-		update_push_freq();
-		logger.info( "Set Daylight Cycle to " + new_cycle_in_minutes );
-	}
-	
-	public long get_inc_time_by()
-	{
-		return inc_time_by;
+		}
+        return DEFAULT_CYCLE_TIME;
 	}
 	
 	//Read the requested daylight cycle time in minutes and return the ratio of that vs the default
@@ -169,10 +137,83 @@ public class LightCycleFunctions{
 		return (double)TICKS_PER_DAY / ( 60.0 * new_cycle_length );
 	}
 	
-	
+	//Registers chat commands with the server sided command manager. Allows for command autocomplete and robust automatic error checking.
 	public void register_server_commands(FMLServerStartingEvent event)
 	{
 		LightCommands.register( event.getCommandDispatcher() );
 	}
+	   
+	//Sets the daylight increment by taking a requested number in minutes and converting it into server ticks per second
+    public void set_inc_time_by(double new_cycle_in_minutes)
+    {
+        this.new_cycle_in_minutes = new_cycle_in_minutes;
+        
+        //Get an even number that is closest to what we want
+        inc_time_by = (long)get_ticks_per_second( new_cycle_in_minutes );
+        DataStorage storage = new DataStorage();
+        storage.write_json( new_cycle_in_minutes );
+        update_push_freq();
+        logger.info( "(LOGGER) Set day length to " + new_cycle_in_minutes + " minutes." );
+    }
 
+    //GETTERS AND SETTERS
+    public World get_world()
+    {
+        return this.world;
+    }
+    
+    public MinecraftServer get_minecraftserver()
+    {
+        return this.minecraftserver;
+    }
+    
+    public GameRules get_gamerules()
+    {
+        return this.gamerules;
+    }
+
+    public IServerConfiguration get_serverconfig()
+    {
+        return this.serverconfig;
+    }
+    
+    public IServerWorldInfo get_worldinfo()
+    {
+        return this.worldinfo;
+    }
+    
+    public int get_update_push_freq()
+    {
+        return this.update_push_freq;
+    }
+    
+    public long get_curr_day_time()
+    {
+        return this.curr_day_time;
+    }
+    
+    public long get_inc_time_by()
+    {
+        return this.inc_time_by;
+    }
+    
+    public double get_new_cycle_in_minutes()
+    {
+        return this.new_cycle_in_minutes;
+    }
+    
+    public void set_update_push_freq(int update_push_freq)
+    {
+        this.update_push_freq = update_push_freq;
+    }
+
+    public void set_inc_time_by(long inc_time_by)
+    {
+        this.inc_time_by = inc_time_by;
+    }
+    
+    public void set_new_cycle_in_minutes(double new_cycle_in_minutes)
+    {
+        this.new_cycle_in_minutes = new_cycle_in_minutes;
+    }
 }

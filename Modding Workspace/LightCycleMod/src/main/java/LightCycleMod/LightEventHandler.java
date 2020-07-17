@@ -33,11 +33,7 @@ public class LightEventHandler {
 	public void on_load( WorldEvent.Load event )
 	{
 		if ( functions == null )
-		{
 			functions = new LightCycleFunctions( event );
-			functions.disable_doDaylightCycle();
-			functions.set_time_on_start();
-		}
 	}
 
 	//Tick the server time on teach server sided world tick.
