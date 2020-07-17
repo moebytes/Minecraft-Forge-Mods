@@ -147,7 +147,7 @@ public class LightCycleFunctions
     {
         this.new_cycle_in_minutes = new_cycle_in_minutes;
         inc_time_by               = (long)get_ticks_per_second( new_cycle_in_minutes );
-        DataStorage storage = new DataStorage();
+        DataStorage storage       = new DataStorage();
         storage.write_json( new_cycle_in_minutes );
         update_push_freq();
         logger.info( "(LOGGER) Set day length to " + new_cycle_in_minutes + " minutes." );
