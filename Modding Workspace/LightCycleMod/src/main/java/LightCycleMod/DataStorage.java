@@ -13,8 +13,8 @@ import org.apache.logging.log4j.Logger;
 public class DataStorage
 {
 
-    private final String json_path          = "lightcyclemod.txt";
-    private final String error_path         = "lasterror.txt";
+    private final String json_path          = "config/lightcyclemod/daylength.txt";
+    private final String error_path         = "config/lightcyclemod/lasterror.txt";
     private final Logger logger             = LogManager.getLogger();
     public final int     DEFAULT_CYCLE_TIME = LightCycleFunctions.instance.DEFAULT_CYCLE_TIME;
 
@@ -32,14 +32,17 @@ public class DataStorage
             logger.info( "Could not print to file: " + e );
             try
             {
+
                 File file = new File( error_path );
+                file.getParentFile().mkdirs();
                 file.createNewFile();
                 FileWriter filewriter = new FileWriter( file );
-                filewriter.write( "Cannot write JSON to file: " + e );
+                filewriter.append( "(WRITE_JSON) Cannot write JSON to file: " + e );
                 filewriter.close();
+
             } catch ( Exception ee )
             {
-                logger.info( "Could not write error message for file writer: " + ee );
+                logger.info( "(WRITE_JSON) Could not write error message for file writer: " + ee );
             }
         }
     }
@@ -63,7 +66,7 @@ public class DataStorage
         // I should return the default value on a failure
         catch ( Exception e )
         {
-            logger.info( "Could not read JSON, catching error: " + e );
+            logger.info( "(READ_JSON) Could not read JSON, catching error: " + e );
             try
             {
 
@@ -72,15 +75,25 @@ public class DataStorage
                 if ( e.getCause().equals( new NullPointerException() ) )
                 {
                     File file = new File( json_path );
+                    file.getParentFile().mkdirs();
                     file.createNewFile();
-                    logger.info( "Could not read file, sending default time to server." );
+
+                    file = new File( error_path );
+                    file.getParentFile().mkdirs();
+                    if ( !file.exists() )
+                        file.createNewFile();
+                    FileWriter filewriter = new FileWriter( file );
+                    filewriter.append( "(READ_JSON) ERROR READING JSON: " + e );
+                    filewriter.append( "(READ_JSON) Could not read file, sending default time to server." );
+
+                    logger.info( "(READ_JSON) Could not read file, sending default time to server." );
                     this.write_json( DEFAULT_CYCLE_TIME );
                 }
 
             } catch ( Exception ee )
             {
-                logger.info( "Could not print error message for file deletion & creation: " + e );
-                logger.info( "Sending default time to server." );
+                logger.info( "(READ_JSON) Could not print error message for file deletion & creation: " + e );
+                logger.info( "(READ_JSON) Sending default time to server." );
                 this.write_json( DEFAULT_CYCLE_TIME );
             }
             return DEFAULT_CYCLE_TIME;

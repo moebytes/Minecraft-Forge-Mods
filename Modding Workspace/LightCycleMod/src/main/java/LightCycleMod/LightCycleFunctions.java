@@ -126,7 +126,11 @@ public class LightCycleFunctions
             if ( file.exists() )
                 return storage.read_json();
             else
+            {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
                 storage.write_json( DEFAULT_CYCLE_TIME );
+            }
         } catch ( Exception e )
         {
             logger.info( "Could not read last increment speed from json: " + e );
