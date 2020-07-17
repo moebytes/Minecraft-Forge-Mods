@@ -66,16 +66,6 @@ public class LightCycleFunctions
     // Tick the server time on server sided world tick.
     public void on_world_tick( ServerTickEvent event )
     {
-        // Check to prevent logical side errors and null values here
-        if ( event.side != LogicalSide.SERVER || event.phase != Phase.START )
-            return;
-
-        if ( world == null )
-        {
-            logger.info( "WORLD IS NULL" );
-            return;
-        }
-
         // Update the current time and then increment it
         curr_day_time = worldinfo.getDayTime();
         long gametime = worldinfo.getGameTime();
@@ -90,7 +80,6 @@ public class LightCycleFunctions
                 minecraftserver.getPlayerList().func_232642_a_( new SUpdateTimePacket( world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean( GameRules.DO_DAYLIGHT_CYCLE ) ),
                     world.func_234923_W_() );
         }
-
     }
 
     public void read_chat( ServerChatEvent event )
