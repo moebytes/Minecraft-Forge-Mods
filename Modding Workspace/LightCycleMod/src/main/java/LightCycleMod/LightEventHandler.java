@@ -27,21 +27,21 @@ public class LightEventHandler
     @SubscribeEvent
     public void on_start( FMLServerStartingEvent event )
     {
-        functions.register_server_commands(event);
+        functions.register_server_commands( event );
     }
 
     @SubscribeEvent
     public void on_load( WorldEvent.Load event )
     {
-        if (functions == null)
-            functions = new LightCycleFunctions(event);
+        if ( functions == null )
+            functions = new LightCycleFunctions( event );
     }
 
     // Tick the server time on teach server sided world tick.
     @SubscribeEvent
     public void on_world_tick( ServerTickEvent event )
     {
-        functions.on_world_tick(event);
+        functions.on_world_tick( event );
     }
 
     public LightCycleFunctions get_functions()

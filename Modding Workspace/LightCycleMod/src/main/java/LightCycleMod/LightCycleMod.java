@@ -21,7 +21,7 @@ public class LightCycleMod
         // Registers these classes and all functions with the @SubscribeEvent the FML
         // event bus, so they will run when we load the mod
         instance = this;
-        MinecraftForge.EVENT_BUS.register(handler);
+        MinecraftForge.EVENT_BUS.register( handler );
     }
 
 }
