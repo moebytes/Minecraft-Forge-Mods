@@ -10,6 +10,11 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
  * Author	: Peter Caylor
  * Date		: 7/11/2020
  * Purpose	: Receives events from forge and runs the appropriate function depending on what is fired.
+ * 
+ *            Events should happen in this order every time:
+ *              1) Server starts, on_start() is fired
+ *              2) Server world is loaded. on_load() is fired
+ *              3) World begins ticking after the server is started and the world is loaded. on_world_tick() is fired.
  */
 
 //Handle events and then run the appropriate functions based on those events
