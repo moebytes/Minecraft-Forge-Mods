@@ -85,7 +85,7 @@ public class DataStorage
                     FileWriter filewriter = new FileWriter( file );
                     filewriter.append( "(READ_JSON) ERROR READING JSON: " + e );
                     filewriter.append( "(READ_JSON) Could not read file, sending default time to server." );
-
+                    filewriter.close();
                     logger.info( "(READ_JSON) Could not read file, sending default time to server." );
                     this.write_json( DEFAULT_CYCLE_TIME );
                 }
