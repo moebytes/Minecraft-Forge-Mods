@@ -61,8 +61,7 @@ public class DataStorage
 
             return Double.parseDouble( data );
         }
-        // If it fails, either the file doesn't exist, the formatting was wrong, or
-        // there was another error somewhere else
+        // If it fails, either the file doesn't exist, the formatting was wrong, or there was another error somewhere else
         // I should return the default value on a failure
         catch ( Exception e )
         {
@@ -70,8 +69,7 @@ public class DataStorage
             try
             {
 
-                // If the file doesn't exist, create a new file and write the default value to
-                // it
+                // If the file doesn't exist, create a new file and write the default value to it
                 if ( e.getCause().equals( new NullPointerException() ) )
                 {
                     File file = new File( json_path );
