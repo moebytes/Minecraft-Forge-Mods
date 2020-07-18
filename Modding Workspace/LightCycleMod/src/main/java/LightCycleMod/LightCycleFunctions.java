@@ -40,6 +40,7 @@ public class LightCycleFunctions
     private double                    new_cycle_in_minutes = 0;
 
     public final int                  DEFAULT_CYCLE_TIME   = 20;
+    public final int                  TICKS_PER_SECOND     = 20;
     public final int                  TICKS_PER_DAY        = 24000;
     private final Logger              LOGGER               = LogManager.getLogger();
 
@@ -66,12 +67,10 @@ public class LightCycleFunctions
         // Update the current time and then increment it
         curr_day_time = worldinfo.getDayTime();
         long gametime = worldinfo.getGameTime();
-        if ( gametime % update_push_freq == 0 && gametime != 0 )
+        if ( gametime % update_push_freq == 0 )
         {
             worldinfo.setDayTime( curr_day_time + (inc_time_by / (DEFAULT_CYCLE_TIME / update_push_freq)) );
-            // logger.info("TIME: " + worldinfo.getDayTime());
-            
-            if ( gametime % 20 != 0 )
+            if ( gametime % TICKS_PER_SECOND != 0 )
                 minecraftserver.getPlayerList().func_232642_a_( new SUpdateTimePacket( world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean( GameRules.DO_DAYLIGHT_CYCLE ) ), world.func_234923_W_() );
         }
     }
