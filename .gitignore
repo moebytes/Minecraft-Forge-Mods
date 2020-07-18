@@ -3,6 +3,7 @@
 **/.gradle
 **/lightcyclemod/build
 **/lightcyclemod/run
+**/.idea
 Modding Workspace/lightcyclemod/.classpath
 Modding Workspace/lightcyclemod/.project
 Modding Workspace/lightcyclemod/.settings
