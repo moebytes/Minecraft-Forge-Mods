@@ -12,10 +12,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.storage.IServerConfiguration;
 import net.minecraft.world.storage.IServerWorldInfo;
 import net.minecraftforge.event.ServerChatEvent;
-import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 /*
@@ -31,8 +29,8 @@ public class LightCycleFunctions
     private World                     world;
     private MinecraftServer           minecraftserver;
     private GameRules                 gamerules;
-    private IServerConfiguration      serverconfig;                                 // func_240793_aU_ is getIServerConfiguration();
-    private IServerWorldInfo          worldinfo;                                    // func_230407_G_ is getIServerWorldInfo
+    private IServerConfiguration      serverconfig;
+    private IServerWorldInfo          worldinfo;
 
     private int                       update_push_freq;
 
@@ -43,15 +41,14 @@ public class LightCycleFunctions
 
     public final int                  DEFAULT_CYCLE_TIME   = 20;
     public final int                  TICKS_PER_DAY        = 24000;
-    private final Logger              logger               = LogManager.getLogger();
+    private final Logger              LOGGER               = LogManager.getLogger();
 
     // Basic setup to do once the world loads
-    // Setup the objects needed to modify the daytime, and set the gamerule
-    // "doDaylightCycle" to false
+    // Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false
     public LightCycleFunctions( WorldEvent.Load event )
     {
         instance        = this;
-        this.world      = event.getWorld().getWorld();
+        world           = event.getWorld().getWorld();
         minecraftserver = this.world.getServer();
         serverconfig    = minecraftserver.func_240793_aU_(); // func_240793_aU_ is get_IServerConfiguration()
         worldinfo       = serverconfig.func_230407_G_();     // func_230407_G_ is get_IServerWorldInfo()
@@ -73,20 +70,17 @@ public class LightCycleFunctions
         {
             worldinfo.setDayTime( curr_day_time + (inc_time_by / (DEFAULT_CYCLE_TIME / update_push_freq)) );
             // logger.info("TIME: " + worldinfo.getDayTime());
-
-            // This already happens every 20 ticks, so I want to do it whenever it is not
-            // normally done
+            
             if ( gametime % 20 != 0 )
-                minecraftserver.getPlayerList().func_232642_a_( new SUpdateTimePacket( world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean( GameRules.DO_DAYLIGHT_CYCLE ) ),
-                    world.func_234923_W_() );
+                minecraftserver.getPlayerList().func_232642_a_( new SUpdateTimePacket( world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean( GameRules.DO_DAYLIGHT_CYCLE ) ), world.func_234923_W_() );
         }
     }
 
     public void read_chat( ServerChatEvent event )
     {
-        logger.info( "READ A CHAT MESSAGE." + event.getMessage() );
-        logger.info( "USERNAME: " + event.getUsername() );
-        logger.info( "MESSAGE : " + event.getMessage() );
+        LOGGER.info( "READ A CHAT MESSAGE." + event.getMessage() );
+        LOGGER.info( "USERNAME: " + event.getUsername() );
+        LOGGER.info( "MESSAGE : " + event.getMessage() );
     }
 
     // Updates how often the server pushes world SUpdateTimePackets to clients
@@ -106,8 +100,6 @@ public class LightCycleFunctions
     // If there is no file storing a previous cycle rate, set it to default
     public double set_time_on_start()
     {
-        // TODO: update read/write functions error catching in case of no file / bad
-        // read uses this logic instead
         DataStorage storage = new DataStorage();
         try
         {
@@ -122,7 +114,7 @@ public class LightCycleFunctions
             }
         } catch ( Exception e )
         {
-            logger.info( "Could not read last increment speed from json: " + e );
+            LOGGER.info( "Could not read last increment speed from json: " + e );
         }
         return DEFAULT_CYCLE_TIME;
     }
@@ -134,15 +126,13 @@ public class LightCycleFunctions
         return (double)TICKS_PER_DAY / (60.0 * new_cycle_length);
     }
 
-    // Registers chat commands with the server sided command manager. Allows for
-    // command autocomplete and robust automatic error checking.
+    // Registers chat commands with the server sided command manager. Allows for command autocomplete and robust automatic error checking.
     public void register_server_commands( FMLServerStartingEvent event )
     {
         LightCommands.register( event.getCommandDispatcher() );
     }
 
-    // Sets the daylight increment by taking a requested number in minutes and
-    // converting it into server ticks per second
+    // Sets the daylight increment by taking a requested number in minutes and converting it into server ticks per second
     public void set_inc_time_by( double new_cycle_in_minutes )
     {
         this.new_cycle_in_minutes = new_cycle_in_minutes;
@@ -150,7 +140,7 @@ public class LightCycleFunctions
         DataStorage storage       = new DataStorage();
         storage.write_json( new_cycle_in_minutes );
         update_push_freq();
-        logger.info( "(LOGGER) Set day length to " + new_cycle_in_minutes + " minutes." );
+        LOGGER.info( "(LOGGER) Set day length to " + new_cycle_in_minutes + " minutes." );
     }
 
     // GETTERS AND SETTERS

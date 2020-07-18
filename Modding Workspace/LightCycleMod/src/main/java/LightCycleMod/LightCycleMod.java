@@ -14,7 +14,6 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 @Mod( "lightcyclemod" )
 public class LightCycleMod
 {
-    // Allows us to reference our main mod class from outside the main mod class
     public static LightCycleMod instance;
     public static final String  mod_id  = "lightcyclemod";
     public LightEventHandler    handler = new LightEventHandler();
@@ -36,6 +35,7 @@ public class LightCycleMod
  *      2) Server world is loaded. on_load() is fired
  *      3) World begins ticking after the server is started and the world is loaded. on_world_tick() is fired.
  */
+
 @Mod.EventBusSubscriber
 //Handle events and then run the appropriate functions based on those events
 class LightEventHandler
