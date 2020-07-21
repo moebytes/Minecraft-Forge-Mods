@@ -63,9 +63,14 @@ public class LightCycleFunctions
     // Tick the server time on server sided world tick.
     public void on_world_tick( ServerTickEvent event )
     {
+        if ( inc_time_by == 0 )
+            return;
+        
         // Update the current time and then increment it
         curr_day_time = worldinfo.getDayTime();
         long gametime = worldinfo.getGameTime();
+        
+        
         if ( gametime % update_push_freq == 0 && gametime != 0 )
         {
             worldinfo.setDayTime( curr_day_time + (inc_time_by / (DEFAULT_CYCLE_TIME / update_push_freq)) );
@@ -86,7 +91,9 @@ public class LightCycleFunctions
     // Updates how often the server pushes world SUpdateTimePackets to clients
     public void update_push_freq()
     {
-        if ( new_cycle_in_minutes < 5 )
+        if ( new_cycle_in_minutes == 0)
+            update_push_freq = 20;
+        else if ( new_cycle_in_minutes < 5 )
             update_push_freq = 2;
         else if ( new_cycle_in_minutes < 10 )
             update_push_freq = 5;
@@ -136,8 +143,13 @@ public class LightCycleFunctions
     public void set_inc_time_by( double new_cycle_in_minutes )
     {
         this.new_cycle_in_minutes = new_cycle_in_minutes;
-        inc_time_by               = (long)get_ticks_per_second( new_cycle_in_minutes );
-        DataStorage storage       = new DataStorage();
+        
+        if ( new_cycle_in_minutes == 0 )
+            inc_time_by = 0;
+        else
+            inc_time_by = (long)get_ticks_per_second( new_cycle_in_minutes );
+        
+        DataStorage storage = new DataStorage();
         storage.write_json( new_cycle_in_minutes );
         update_push_freq();
         LOGGER.info( "(LOGGER) Set day length to " + new_cycle_in_minutes + " minutes." );
