@@ -70,7 +70,7 @@ public class LightCycleFunctions
     }
 
     // Updates how often the server pushes world SUpdateTimePackets to clients
-    private void update_push_freq(Double new_cycle_in_minutes)
+    private void update_push_freq( double new_cycle_in_minutes )
     {
         //Update push frequency is the amount of ticks per 1 update
         if ( new_cycle_in_minutes <= 0 )
