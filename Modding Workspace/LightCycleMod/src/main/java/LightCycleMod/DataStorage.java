@@ -16,7 +16,7 @@ public class DataStorage
     private final String json_path          = "config/lightcyclemod/daylength.txt";
     private final String error_path         = "config/lightcyclemod/lasterror.txt";
     private final Logger logger             = LogManager.getLogger();
-    public final int     DEFAULT_CYCLE_TIME = LightCycleFunctions.instance.DEFAULT_CYCLE_TIME;
+    public  final int    DEFAULT_CYCLE_TIME = LightCycleFunctions.instance.DEFAULT_CYCLE_TIME;
 
     // Writes the light cycle time to a file.
     public void write_json( double new_length )
