@@ -41,7 +41,6 @@ public class LightCycleMod
 //Handle events and then run the appropriate functions based on those events
 class LightEventHandler
 {
-
     private LightCycleFunctions functions;
 
     @SubscribeEvent
@@ -68,5 +67,4 @@ class LightEventHandler
     {
         return functions;
     }
-
 }
