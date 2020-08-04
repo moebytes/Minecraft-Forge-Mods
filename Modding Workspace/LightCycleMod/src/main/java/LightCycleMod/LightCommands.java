@@ -19,12 +19,15 @@ public class LightCommands
 {
 
     static LightCycleFunctions functions = LightCycleMod.instance.handler.get_functions();
+    static final int OP_PERMISSION_LEVEL = 2;
+    static final int MIN_DAY_LENGTH      = -10000;
+    static final int MAX_DAY_LENGTH      = 10000;
 
     public static void register( CommandDispatcher<CommandSource> dispatcher )
     {
         dispatcher.register(
-            Commands.literal( LightCycleMod.mod_id ).then( Commands.literal( "set" ).requires( cs -> cs.hasPermissionLevel( 2 ) )
-                .then( Commands.argument( "Light Cycle Duration: Minutes", DoubleArgumentType.doubleArg( -10000, 10000 ) ).executes( ( context ) ->
+            Commands.literal( LightCycleMod.mod_id ).then( Commands.literal( "set" ).requires( cs -> cs.hasPermissionLevel( OP_PERMISSION_LEVEL ) )
+                .then( Commands.argument( "Light Cycle Duration: Minutes", DoubleArgumentType.doubleArg( MIN_DAY_LENGTH, MAX_DAY_LENGTH ) ).executes( ( context ) ->
                     {
                         return (int)set_light_cycle_length( context.getSource(), DoubleArgumentType.getDouble( context, "Light Cycle Duration: Minutes" ) );
                     } ) ) ) );

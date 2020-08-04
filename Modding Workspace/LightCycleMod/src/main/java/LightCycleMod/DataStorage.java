@@ -13,91 +13,61 @@ import org.apache.logging.log4j.Logger;
 public class DataStorage
 {
 
-    private final String json_path          = "config/lightcyclemod/daylength.txt";
-    private final String error_path         = "config/lightcyclemod/lasterror.txt";
-    private final Logger logger             = LogManager.getLogger();
-    public final int     DEFAULT_CYCLE_TIME = LightCycleFunctions.instance.DEFAULT_CYCLE_TIME;
+    private static final String json_path       = "config/lightcyclemod/daylength.txt";
+    private static final String error_path      = "config/lightcyclemod/lasterror.txt";
+    private static final Logger logger          = LogManager.getLogger();
+    public  static final int DEFAULT_CYCLE_TIME = LightCycleFunctions.instance.DEFAULT_CYCLE_TIME;
 
-    // Writes the light cycle time to a file.
-    public void write_json( double new_length )
-    {
+    //These will just be a single line txt file since I don't need to store more than a single value
+    public static void write_json( double new_length )
+    {            
+        File file = new File( json_path );
+        if ( !file.exists() )
+            create_files(file);
+        
         try
         {
-            File       file       = new File( json_path );
             FileWriter filewriter = new FileWriter( file );
             filewriter.write( Double.toString( new_length ) );
             filewriter.close();
-        } catch ( Exception e )
+        }
+        catch ( Exception e )
         {
             logger.info( "Could not print to file: " + e );
-            try
-            {
-
-                File file = new File( error_path );
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-                FileWriter filewriter = new FileWriter( file );
-                filewriter.append( "(WRITE_JSON) Cannot write JSON to file: " + e );
-                filewriter.close();
-
-            } catch ( Exception ee )
-            {
-                logger.info( "(WRITE_JSON) Could not write error message for file writer: " + ee );
-            }
         }
     }
-
-    // Reads the light cycle time from a file named {json_path}
-    // Only reads one line that contains the day length stored as a double
-    public double read_json()
+    
+    public static double read_json()
     {
-        // Try to read the file
         try
         {
             File    file        = new File( json_path );
             Scanner file_reader = new Scanner( file );
             String  data        = file_reader.nextLine();
             file_reader.close();
-
             return Double.parseDouble( data );
         }
-        // If it fails, either the file doesn't exist, the formatting was wrong, or there was another error somewhere else
-        // I should return the default value on a failure
         catch ( Exception e )
         {
-            logger.info( "(READ_JSON) Could not read JSON, catching error: " + e );
-            try
-            {
-
-                // If the file doesn't exist, create a new file and write the default value to it
-                if ( e.getCause().equals( new NullPointerException() ) )
-                {
-                    File file = new File( json_path );
-                    file.getParentFile().mkdirs();
-                    file.createNewFile();
-
-                    file = new File( error_path );
-                    file.getParentFile().mkdirs();
-                    if ( !file.exists() )
-                        file.createNewFile();
-                    FileWriter filewriter = new FileWriter( file );
-                    filewriter.append( "(READ_JSON) ERROR READING JSON: " + e );
-                    filewriter.append( "(READ_JSON) Could not read file, sending default time to server." );
-                    filewriter.close();
-                    logger.info( "(READ_JSON) Could not read file, sending default time to server." );
-                    this.write_json( DEFAULT_CYCLE_TIME );
-                }
-
-            } catch ( Exception ee )
-            {
-                logger.info( "(READ_JSON) Could not print error message for file deletion & creation: " + e );
-                logger.info( "(READ_JSON) Sending default time to server." );
-                this.write_json( DEFAULT_CYCLE_TIME );
-            }
-            return DEFAULT_CYCLE_TIME;
+            logger.info( "Could not read " + json_path );
+        }
+        write_json( DEFAULT_CYCLE_TIME );
+        return DEFAULT_CYCLE_TIME;
+    }
+    
+    private static void create_files( File file )
+    {
+        try
+        {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        }
+        catch ( Exception e)
+        {
+            logger.info( "Could not create new files to write data." );
         }
     }
-
+    
     public String get_json_path()
     {
         return json_path;

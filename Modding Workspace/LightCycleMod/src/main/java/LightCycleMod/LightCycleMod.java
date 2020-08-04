@@ -16,18 +16,19 @@ public class LightCycleMod
 {
     public static LightCycleMod instance;
     public static final String  mod_id  = "lightcyclemod";
-    public LightEventHandler    handler = new LightEventHandler();
+    public LightEventHandler    handler;
 
     // Register the functions for ForgeModLoader
     public LightCycleMod()
     {
-        // Registers these classes and all functions with the @SubscribeEvent the FML
-        // event bus, so they will run when we load the mod
+        // Registers these classes and all functions with the @SubscribeEvent the FML event bus, so they will run when we load the mod
+        handler = new LightEventHandler();
         instance = this;
         MinecraftForge.EVENT_BUS.register( handler );
     }
 
 }
+
 
 /*
  * Events should happen in this order every time:
@@ -40,7 +41,6 @@ public class LightCycleMod
 //Handle events and then run the appropriate functions based on those events
 class LightEventHandler
 {
-
     private LightCycleFunctions functions;
 
     @SubscribeEvent
@@ -67,5 +67,4 @@ class LightEventHandler
     {
         return functions;
     }
-
 }
