@@ -1,7 +1,5 @@
 package LightCycleMod;
 
-import java.io.File;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,16 +21,15 @@ import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 public class LightCycleFunctions
 {
-
     public static LightCycleFunctions instance;
     private World                     world;
     private MinecraftServer           minecraftserver;
     private IServerWorldInfo          worldinfo;
     private int                       update_push_freq;
     private long                      inc_time_by;
-    public  final int                 DEFAULT_CYCLE_TIME   = 20;
-    public  final int                 TICKS_PER_DAY        = 24000;
-    private final Logger              LOGGER               = LogManager.getLogger();
+    public  final int                 DEFAULT_CYCLE_TIME = 20;
+    public  final int                 TICKS_PER_DAY      = 24000;
+    private final Logger              LOGGER             = LogManager.getLogger();
 
     // Basic setup to do once the world loads
     // Setup the objects needed to modify the daytime, and set the gamerule "doDaylightCycle" to false
@@ -43,10 +40,10 @@ public class LightCycleFunctions
         minecraftserver                   = world.getServer();
         IServerConfiguration serverconfig = minecraftserver.func_240793_aU_(); // func_240793_aU_ is getIServerConfiguration()
         worldinfo                         = serverconfig.func_230407_G_();     // func_230407_G_  is getIServerWorldInfo()
-        GameRules gamerules               = minecraftserver.getGameRules();
+        GameRules               gamerules = minecraftserver.getGameRules();
 
         gamerules.get( GameRules.DO_DAYLIGHT_CYCLE ).set( false, minecraftserver );
-        double new_cycle_in_minutes = set_time_on_start();
+        double new_cycle_in_minutes = DataStorage.read_json();
         update_push_freq( new_cycle_in_minutes );
         set_inc_time_by( new_cycle_in_minutes );
     }
@@ -63,9 +60,8 @@ public class LightCycleFunctions
         
         if ( gametime % update_push_freq == 0 && gametime != 0 )
         {
-            worldinfo.setDayTime( curr_day_time + (inc_time_by / (DEFAULT_CYCLE_TIME / update_push_freq)) );
-            if ( gametime % 20 != 0 )
-                minecraftserver.getPlayerList().func_232642_a_( new SUpdateTimePacket( world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean( GameRules.DO_DAYLIGHT_CYCLE ) ), world.func_234923_W_() );
+            worldinfo.setDayTime( curr_day_time + ( (inc_time_by / (DEFAULT_CYCLE_TIME / update_push_freq)) / 2 ) );
+            minecraftserver.getPlayerList().func_232642_a_( new SUpdateTimePacket( world.getGameTime(), world.getDayTime(), world.getGameRules().getBoolean( GameRules.DO_DAYLIGHT_CYCLE ) ), world.func_234923_W_() );
         }
     }
 
@@ -84,29 +80,6 @@ public class LightCycleFunctions
         else
             update_push_freq = 20;
     }
-
-    // Sets the server cycle rate on start
-    // If there is no file storing a previous cycle rate, set it to default
-    public double set_time_on_start()
-    {
-        DataStorage storage = new DataStorage();
-        try
-        {
-            File file = new File( storage.get_json_path() );
-            if ( file.exists() )
-                return storage.read_json();
-            else
-            {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-                storage.write_json( DEFAULT_CYCLE_TIME );
-            }
-        } catch ( Exception e )
-        {
-            LOGGER.info( "Could not read last increment speed from json: " + e );
-        }
-        return DEFAULT_CYCLE_TIME;
-    }
     
     // Sets the daylight increment by taking a requested number in minutes and converting it into server ticks per second
     public void set_inc_time_by( double new_cycle_in_minutes )
@@ -116,8 +89,7 @@ public class LightCycleFunctions
         else
             inc_time_by = (long)get_ticks_per_second( new_cycle_in_minutes );
         
-        DataStorage storage = new DataStorage();
-        storage.write_json( new_cycle_in_minutes );
+        DataStorage.write_json( new_cycle_in_minutes );
         LOGGER.info( "(LOGGER) Set day length to " + new_cycle_in_minutes + " minutes." );
         
         update_push_freq( new_cycle_in_minutes );
