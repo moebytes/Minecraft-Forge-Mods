@@ -1,0 +1,25 @@
+**/bin
+**/.metadata
+**/.gradle
+**/lightcyclemod/build
+**/lightcyclemod/run
+**/.idea
+Modding Workspace/lightcyclemod/.classpath
+Modding Workspace/lightcyclemod/.project
+Modding Workspace/lightcyclemod/.settings
+Modding Workspace/lightcyclemod/gradle
+Modding Workspace/lightcyclemod/gradlew
+Modding Workspace/lightcyclemod/gradlew.bat
+Modding Workspace/lightcyclemod/build.gradle
+Modding Workspace/lightcyclemod/runClient.bat
+Modding Workspace/lightcyclemod/runClient.launch
+Modding Workspace/lightcyclemod/runData.launch
+Modding Workspace/lightcyclemod/runServer.bat
+Modding Workspace/lightcyclemod/runServer.launch
+Modding Workspace/lightcyclemod/src/**/pack.mcmeta
+
+Modding Workspace/LightCycleMod/LightCycleMod.iml
+Modding Workspace/LightCycleMod/.idea/vcs.xml
+Modding Workspace/LightCycleMod/.idea/modules.xml
+Modding Workspace/LightCycleMod/.idea/misc.xml
+Modding Workspace/LightCycleMod/BuildProject.bat
